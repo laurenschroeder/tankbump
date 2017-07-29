@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Simple HERE Map Display</title>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<script src="/assets/hereAccount-544e48d6c421ab33cda038af90f7d0f9fb48c69991714d3ffa3b2710a6057672.js"></script>
+		<link rel="stylesheet" type="text/css" href="https://js.cit.api.here.com/v3/3.0/mapsjs-ui.css">
+		<script src="https://account.here.com/js/sdk/sso.min.js"></script>
+			<script type="text/javascript" charset="UTF-8" src="https://js.cit.api.here.com/v3/3.0/mapsjs-core.js"></script>
+			<script type="text/javascript" charset="UTF-8" src="https://js.cit.api.here.com/v3/3.0/mapsjs-service.js"></script>
+			<script type="text/javascript" charset="UTF-8" src="https://js.cit.api.here.com/v3/3.0/mapsjs-mapevents.js"></script>
+			<script type="text/javascript" charset="UTF-8" src="https://js.cit.api.here.com/v3/3.0/mapsjs-pano.js"></script>
+			<script type="text/javascript" charset="UTF-8" src="https://js.cit.api.here.com/v3/3.0/mapsjs-ui.js"></script>
+			<script type="text/javascript" charset="UTF-8" src="https://js.cit.api.here.com/v3/3.0/mapsjs-clustering.js"></script>
+			<script type="text/javascript" charset="UTF-8" src="https://js.cit.api.here.com/v3/3.0/mapsjs-data.js"></script>
+			<!-- script type="text/javascript" charset="UTF-8" src="https://js.cit.api.here.com/v3/3.0/mapsjs-3d.js"></script-->
+			
+
+		<link rel="shortcut icon" type="image/x-icon" href="/assets/favicon-b11b589c436fb4354ff7ae08b125a27ad29e211ead5de1ab480114e3b8951a16.ico" />
+		<link rel="stylesheet" media="screen" href="/assets/application-9d311f5c7470887419897cd7e368c08c26966d42d0dba428e086cb714d21e49c.css" data-turbolinks-track="true" />
+		<script src="/assets/application-800ab3788ee2d0fb547f4a18ad7608ad28c9a4199cfb2138b6a17fd28b558a4a.js" data-turbolinks-track="true"></script>
+		<meta name="csrf-param" content="authenticity_token" />
+<meta name="csrf-token" content="L5rbCiOig/NGFz8GsZB7vu4SXy71qTZOYG4Osp4/QmuNPdnnNPgkElgPoroc0tissE6fYDfNcpBkoS6w/ETQeA==" />
+		
+		
+	  
+	</head>
+	<body>
+		
+		<script>
+//<![CDATA[
+initLogin('inCUge3uprAQEtRaruyaZ8','https://account.here.com','frame','en-EN','password','http://tcs.ext.here.com/','false');
+//]]>
+</script> 
+		
+		<nav class="navbar navbar-default navbar-fixed-top">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-xs-1">
+						<div class="navbar-header">
+							<a class="navbar-brand" href="http://tcs.ext.here.com/"><img alt="HERE logo" src="/assets/logo-6248f7cafa38463a8a3e374207cdd304924d9815c8c2a945e0dfc02facf28802.svg" width="60" height="44" /></a>
+						</div>
+					</div>
+					<div class="col-xs-10">
+						<div class="header-text">Simple HERE Map Display</div>
+					</div>
+					 <div id="logoutButton" onclick="javascript:logOut()" class="hvr2-overline-reveal hvr2-overline-reveal-min-width">
+						<a href="/login" >Log Out</a>
+					</div> 
+				</div>
+			</div>
+		</nav>
+		<div id="content-padder"></div>
+		<div id="content-real">
+			
+<div class="ctrl-panel">
+	<span id="toggle-ctrl-panel" class="glyphicon glyphicon-menu-left"></span>
+	<p>This example shows how a route manager <br/>
+		can be used to calculate a route from: <br/>
+		<b>Westin Grand hotel, Berlin</b> (52.516222,13.388900)
+		<br/>to: <br/>
+		<b>Staatsoper, Berlin</b>(52.517175, 13.395129)
+		<br/>and push routing result to the map.</p>
+	<p>Routing manager supports various options
+		<br/>in making a routing request like setting type,
+		<br/>transport mode and routes to avoid.</p>
+	<div>HLP Service releases which are used in this demo:</div>
+	<div id="releaseInfoTxt" style="left:0; top:0; z-index: 0;" value="Used Service Releases:/n"></div>
+</div>
+
+<div id="mapContainer"></div>
+
+<script type="text/javascript">
+	/*
+	author domschuette
+	(C) HERE 2015
+	*/
+
+	// Check whether the environment should use hi-res maps
+	var hidpi = ('devicePixelRatio' in window && devicePixelRatio > 1);
+
+	var mapContainer = document.getElementById('mapContainer');
+
+	// check if the site was loaded via secure connection
+	var secure = (location.protocol === 'https:') ? true : false;
+	
+	platform = new H.service.Platform({
+		app_code: ptxX3lme-goimXQO7-O1ag,
+		app_id: BDThCRQ8n9HCHalSmPBD,
+		useCIT: true,
+		useHTTPS: secure
+	}),
+	maptypes = platform.createDefaultLayers(hidpi ? 512 : 256, hidpi ? 320 : null),
+	router = platform.getRoutingService(),
+
+	map = new H.Map(mapContainer, maptypes.normal.map,
+		{
+			center: center,
+			zoom: zoom
+		}
+	);
+
+	// Do not draw under control panel
+	map.getViewPort().setPadding(0, 0, 0, $('.ctrl-panel').width());
+
+	// add behavior control
+	new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+
+	// Enable the default UI
+	var ui = H.ui.UI.createDefault(map, maptypes);
+	//add JS API Release information
+	releaseInfoTxt.innerHTML+="JS API: 3."+ H.buildInfo().version;
+
+	//add MRS Release information
+	loadMRSVersionTxt();
+
+	//helper
+	var releaseRoutingShown = false;
+
+	// setup the Streetlevel imagery
+	platform.configure(H.map.render.panorama.RenderEngine);
+
+	window.addEventListener('resize', function() { map.getViewPort().resize(); });
+
+	function calculateRoute()
+	{
+		var calculateRouteParams = {
+
+			'waypoint0' : '52.516222,13.388900',
+			'waypoint1' : '52.517175,13.395129',
+			'mode': 'fastest;car;traffic:disabled',
+			'representation': 'display'
+		},
+		onResult = function(result) {
+			//add Routing Release number if not already done
+			if (releaseRoutingShown== false){
+				releaseInfoTxt.innerHTML+="<br />HLP Routing: "+result.response.metaInfo.moduleVersion;
+				releaseRoutingShown = true;
+			}
+			var strip = new H.geo.Strip(),
+			shape = result.response.route[0].shape,
+			i,
+			l = shape.length;
+
+			for(i = 0; i < l; i++)
+			{
+				strip.pushLatLngAlt.apply(strip, shape[i].split(',').map(function(item) { return parseFloat(item); }));
+			}
+			var polyline = new H.map.Polyline(strip,
+				{
+					style:
+					{
+						lineWidth: 10,
+						strokeColor: "rgba(0, 128, 0, 0.7)"
+					}
+				});
+
+				map.addObject(polyline);
+				 map.setViewBounds(polyline.getBounds(), true);
+		},
+		onError = function(error) {
+			console.log(error);
+		}
+		router.calculateRoute(calculateRouteParams, onResult, onError);
+	}
+
+	var displayReady = function(e)
+	{
+		map.removeEventListener("mapviewchangeend", displayReady);
+		calculateRoute();
+	};
+
+	map.addEventListener("mapviewchangeend", displayReady);
+</script>
+
+		</div>
+		<div id="frame-container"/>
+		
+	    <script>
+	    	checkLoggedIn();
+	    </script>
+		
+	</body>
+</html>
